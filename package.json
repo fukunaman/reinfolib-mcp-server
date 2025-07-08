@@ -1,6 +1,6 @@
 {
   "name": "reinfolib-mcp-server",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "type": "module",
   "description": "MCP server for real estate information library API",
   "main": "dist/server.js",
@@ -11,7 +11,7 @@
     "clean": "rm -rf dist"
   },
   "keywords": ["mcp", "real-estate", "api"],
-  "author": "Your Name",
+  "author": "fukunaman",
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^0.4.0",
