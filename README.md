@@ -1,6 +1,6 @@
 # 不動産情報MCPサーバー
 
-このプロジェクトは、国土交通省のReinfolib APIを使用して不動産情報を取得するためのModel Context Protocol（MCP）サーバーです。
+このプロジェクトは、国土交通省の不動産情報ライブラリのAPIを使用して不動産情報を取得するためのModel Context Protocol（MCP）サーバーです。
 
 ## 📋 前提条件
 
