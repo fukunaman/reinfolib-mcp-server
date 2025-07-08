@@ -16,7 +16,7 @@
 
 ```bash
 # GitHubからクローンする場合
-git clone https://github.com/your-username/reinfolib-mcp-server.git
+git clone https://github.com/fukunaman/reinfolib-mcp-server.git
 cd reinfolib-mcp-server
 
 # またはZIPファイルをダウンロードして展開
@@ -164,87 +164,3 @@ reinfolib-mcp-server-server/
 2. アカウントを作成
 3. APIキーを申請・取得
 4. 取得したAPIキーを `.env` ファイルに設定
-
-## 📝 重要な注意事項
-
-### タイル座標について
-
-ポイントAPI（`search_land_price_points`, `search_real_estate_price_points`）では、タイル座標（z, x, y）を指定する必要があります：
-
-- **公式例座標**: `z=13, x=7312, y=3008`
-- **タイル座標変換ツール**: https://www.maptiler.com/google-maps-coordinates-tile-bounds-projection/
-- **ズームレベル**: 11-15（高いほど詳細エリア）
-
-### 期間指定の形式
-
-**不動産価格ポイントAPI** では、期間をYYYYN形式で指定します：
-- `"20223"` = 2022年第3四半期
-- `"20234"` = 2023年第4四半期
-- 四半期: 1=1-3月, 2=4-6月, 3=7-9月, 4=10-12月
-
-## 🐛 トラブルシューティング
-
-### よくある問題と解決方法
-
-#### 1. "REINFOLIB_API_KEY environment variable is required" エラー
-
-**原因**: APIキーが設定されていません。
-
-**解決方法**: 
-- `.env` ファイルが存在することを確認
-- APIキーが正しく設定されていることを確認
-- `.env` ファイルがプロジェクトルートにあることを確認
-
-#### 2. ポイントAPIで400エラーが発生する
-
-**原因**: タイル座標や期間形式が正しくない可能性があります。
-
-**解決方法**:
-- 公式例座標 `z=13, x=7312, y=3008` を使用
-- 期間形式をYYYYN（5桁）で指定（例: "20223"）
-- 最小期間: 20053（2005年第3四半期）以降
-
-#### 3. "Result too long, truncated" エラー
-
-**原因**: レスポンスデータが大きすぎます（Claude Desktop の100,000文字制限）。
-
-**解決方法**:
-- より高いズームレベル（z=14, z=15）を指定してエリアを絞る
-- 期間を短縮する
-- より具体的なフィルター条件を追加
-
-#### 4. ビルドエラーが発生する
-
-**解決方法**:
-```bash
-# 依存関係を再インストール
-pnpm install
-
-# ビルドファイルをクリーンして再ビルド
-pnpm run clean
-pnpm run build
-```
-
-#### 5. Node.jsのバージョンエラー
-
-**解決方法**: Node.js 18.0.0以上にアップグレードしてください。
-
-## 📚 参考資料
-
-- [Model Context Protocol 公式ドキュメント](https://modelcontextprotocol.io/)
-- [国土交通省 不動産情報ライブラリ](https://www.reinfolib.mlit.go.jp/)
-- [TypeScript 公式ドキュメント](https://www.typescriptlang.org/)
-
-## 📄 ライセンス
-
-このプロジェクトは MIT ライセンスの下で公開されています。
-
-## 🤝 コントリビューション
-
-プルリクエストや Issue の報告を歓迎します。プロジェクトの改善にご協力ください。
-
----
-
-## 📞 サポート
-
-問題が発生した場合や質問がある場合は、GitHub Issues でお気軽にお問い合わせください。
