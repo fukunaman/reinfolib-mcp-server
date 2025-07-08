@@ -95,6 +95,33 @@ pnpm run dev
 
 このサーバーは標準入出力（stdio）を使用してMCPクライアントと通信します。Claude DesktopやCursorなどのMCPクライアントから接続できます。
 
+### Claude Desktopでの設定
+
+Claude Desktopでこのサーバーを使用するには、設定ファイルを作成してください：
+
+```bash
+# 設定ファイルを作成・編集
+nano ~/Library/Application\ Support/Claude/claude_desktop_config.json
+```
+
+設定ファイルの内容：
+
+```json
+{
+  "mcpServers": {
+    "reinfolib-mcp-server": {
+      "command": "node",
+      "args": ["path/to/your/reinfolib-mcp-server/dist/server.js"]
+    }
+  }
+}
+```
+
+**注意**: 
+- `path/to/your/reinfolib-mcp-server` を実際のプロジェクトパスに変更してください
+
+設定完了後、Claude Desktopを再起動してください。
+
 ### 利用可能なツール
 
 #### 1. 不動産取引情報の検索 (`search_transactions`)
