@@ -6,6 +6,7 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 import { ReinfolibAPI } from './api/reinfolib.js';
 import { SearchParams, TransactionSearchParams, AppraisalSearchParams, LandPricePointSearchParams, RealEstatePricePointSearchParams } from './types.js';
+import { getStationCodeByName, getStationByCode, searchStations, StationData } from './utils/station.js';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
@@ -265,6 +266,49 @@ class RealEstateMCPServer {
               },
               required: ['z', 'x', 'y', 'from', 'to']
             }
+          },
+          {
+            name: 'get_station_code',
+            description: 'Get station code by station name using National Land Numerical Information data',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                stationName: {
+                  type: 'string',
+                  description: 'Station name to search for (e.g., "新宿", "東京", "横浜")'
+                }
+              },
+              required: ['stationName']
+            }
+          },
+          {
+            name: 'get_station_info',
+            description: 'Get station information by station code',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                stationCode: {
+                  type: 'string',
+                  description: 'Station code (6-digit code from National Land Numerical Information)',
+                  pattern: '^[0-9]{6}$'
+                }
+              },
+              required: ['stationCode']
+            }
+          },
+          {
+            name: 'search_stations',
+            description: 'Search for stations by name or code',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                query: {
+                  type: 'string',
+                  description: 'Search query (station name or code)'
+                }
+              },
+              required: ['query']
+            }
           }
         ]
       };
@@ -347,6 +391,55 @@ class RealEstateMCPServer {
                 {
                   type: 'text',
                   text: JSON.stringify(realEstatePricePoints, null, 2)
+                }
+              ]
+            };
+
+          case 'get_station_code':
+            const stationName = args?.stationName as string;
+            if (!stationName) {
+              throw new Error('Station name is required');
+            }
+            const stationCode = await getStationCodeByName(stationName);
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify({
+                    stationName,
+                    stationCode,
+                    found: stationCode !== null
+                  }, null, 2)
+                }
+              ]
+            };
+
+          case 'get_station_info':
+            const code = args?.stationCode as string;
+            if (!code) {
+              throw new Error('Station code is required');
+            }
+            const stationInfo = await getStationByCode(code);
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(stationInfo, null, 2)
+                }
+              ]
+            };
+
+          case 'search_stations':
+            const query = args?.query as string;
+            if (!query) {
+              throw new Error('Search query is required');
+            }
+            const stations = await searchStations(query);
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(stations, null, 2)
                 }
               ]
             };

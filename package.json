@@ -10,16 +10,22 @@
     "dev": "ts-node --esm src/server.ts",
     "clean": "rm -rf dist"
   },
-  "keywords": ["mcp", "real-estate", "api"],
+  "keywords": [
+    "mcp",
+    "real-estate",
+    "api"
+  ],
   "author": "fukunaman",
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^0.4.0",
     "axios": "^1.6.0",
-    "dotenv": "^16.0.0"
+    "dotenv": "^16.0.0",
+    "shapefile": "^0.6.6"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "@types/shapefile": "^0.6.4",
     "ts-node": "^10.9.0",
     "typescript": "^5.0.0"
   },
