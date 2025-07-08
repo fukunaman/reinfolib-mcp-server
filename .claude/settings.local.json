@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm run:*)",
+      "WebFetch(domain:www.reinfolib.mlit.go.jp)",
+      "Bash(node:*)",
+      "Bash(rm:*)",
+      "WebFetch(domain:nlftp.mlit.go.jp)"
+    ],
+    "deny": []
+  }
+}
