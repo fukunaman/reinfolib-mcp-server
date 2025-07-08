@@ -11,15 +11,20 @@
 - **MCPサーバー**: `src/server.ts` - MCP SDKを使用したメインサーバーの実装
 - **APIレイヤー**: `src/api/reinfolib.ts` - Reinfolib APIのラッパー
 - **型定義**: `src/types.ts` - 物件データと検索パラメータ用のTypeScriptインターフェース
+- **駅情報ユーティリティ**: `src/utils/station.ts` - GISデータを使用した駅情報検索機能
 - **トランスポート**: MCPクライアントとの通信にstdioトランスポートを使用
+- **GISデータ**: `gis/` - 国土数値情報（鉄道データ）N02-22のShapefileデータ
 
-サーバーは以下の6つのメインツールを提供します：
+サーバーは以下の9つのメインツールを提供します：
 - `search_transactions`: 不動産取引価格情報の検索（XIT001）
 - `search_properties`: 様々なフィルターで物件を検索（XIT001ラッパー）
 - `get_municipalities`: 都道府県内の市区町村一覧取得（XIT002）
 - `search_appraisals`: 地価公示情報の検索（XCT001）
 - `search_land_price_points`: 地価公示・地価調査のポイント（点）情報（XPT002）
 - `search_real_estate_price_points`: 不動産価格（取引価格・成約価格）のポイント（点）情報（XPT001）
+- `get_station_code`: 駅名から駅コードを取得（GISデータ使用）
+- `get_station_info`: 駅コードから駅情報を取得（GISデータ使用）
+- `search_stations`: 駅名や駅コードで駅を検索（GISデータ使用）
 
 ## 開発コマンド
 
@@ -77,6 +82,40 @@ API認証のために`.env`ファイルに`REINFOLIB_API_KEY`環境変数を設�
 
 すべてのAPIは以下のベースURLを使用: `https://www.reinfolib.mlit.go.jp/ex-api/external/`
 
+## 駅情報検索機能
+
+### GISデータの詳細
+- **データソース**: 国土交通省 国土数値情報（鉄道）N02-22
+- **データ形式**: ESRI Shapefile (.shp/.dbf)
+- **収録駅数**: 10,220駅
+- **文字エンコーディング**: Shift-JIS
+- **データ配置**: `gis/N02-22_Station.shp`、`gis/N02-22_Station.dbf`
+
+### 駅情報機能
+- **get_station_code**: 駅名から6桁の駅コードを取得
+- **get_station_info**: 駅コードから駅情報（名前、座標）を取得
+- **search_stations**: 駅名や駅コードで駅を検索
+
+### 駅コード形式
+駅コードは6桁の数字で構成されます：
+- 新宿駅: 003700
+- 東京駅: 003766
+- 横浜駅: 004633
+
+### 使用例
+```typescript
+// 駅名から駅コードを取得
+const stationCode = await getStationCodeByName("新宿");
+
+// 駅コードを使って不動産取引を検索
+const transactions = await searchTransactions({
+  year: "2023",
+  quarter: "1",
+  area: "13",
+  station: stationCode
+});
+```
+
 ## 主要実装詳細
 
 - ES2022にコンパイルされるTypeScriptでESモジュールを使用
@@ -86,3 +125,6 @@ API認証のために`.env`ファイルに`REINFOLIB_API_KEY`環境変数を設�
 - Reinfolib APIへのHTTPリクエストにaxiosを使用
 - 現在XIT001、XIT002、XCT001、XPT001、XPT002エンドポイントを実装；他のAPIも同様のパターンで追加可能
 - バリデーションは無効化されており、パラメータは直接APIに渡される
+- GIS駅データは初回読み込み時にメモリにキャッシュされ、高速検索が可能
+- `shapefile` ライブラリを使用してShapefileデータを読み込み
+- 駅情報検索では完全一致と部分一致の両方をサポート

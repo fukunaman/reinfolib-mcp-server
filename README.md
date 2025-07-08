@@ -9,6 +9,7 @@
 - **Node.js** (バージョン18.0.0以上)
 - **pnpm** (推奨) または npm
 - **Reinfolib API キー** (国土交通省から取得)
+- **GISデータ** (N02-22_Station.shp/dbf ファイル、手動でgis/フォルダに配置が必要)
 
 ## 🚀 クイックスタート
 
@@ -42,13 +43,33 @@ REINFOLIB_API_KEY=your_api_key_here
 
 **重要**: `your_api_key_here` を実際のReinfolib APIキーに置き換えてください。
 
-### 4. プロジェクトをビルド
+### 4. GISデータファイルの配置
+
+駅情報検索機能を使用するには、国土数値情報（鉄道データ）をダウンロードして配置する必要があります。
+
+1. [国土数値情報（鉄道データ）](https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-N02-v3_1.html)にアクセス
+2. 「令和4年度」データの「全国」版をダウンロード（N02-22_Station.zip）
+3. ZIPファイルを解凍し、以下のファイルを `gis/` フォルダにコピー：
+   - `N02-22_Station.shp`
+   - `N02-22_Station.dbf`
+
+```bash
+# gisフォルダを作成
+mkdir gis
+
+# ダウンロードしたファイルをコピー
+cp path/to/downloaded/N02-22_Station.* gis/
+```
+
+**注意**: これらのGISファイルは容量が大きいため、Gitリポジトリには含まれていません。各自でダウンロードして配置してください。
+
+### 5. プロジェクトをビルド
 
 ```bash
 pnpm run build
 ```
 
-### 5. サーバーを起動
+### 6. サーバーを起動
 
 ```bash
 # 本番環境での起動
@@ -137,10 +158,40 @@ pnpm run dev
 }
 ```
 
+#### 7. 駅コード取得 (`get_station_code`)
+
+駅名から駅コードを取得します。不動産取引検索の `station` パラメータに使用できます。
+
+```json
+{
+  "stationName": "新宿"
+}
+```
+
+#### 8. 駅情報取得 (`get_station_info`)
+
+駅コードから駅情報（名前、座標等）を取得します。
+
+```json
+{
+  "stationCode": "003700"
+}
+```
+
+#### 9. 駅検索 (`search_stations`)
+
+駅名や駅コードで駅を検索します。
+
+```json
+{
+  "query": "東京"
+}
+```
+
 ## 📁 プロジェクト構造
 
 ```
-reinfolib-mcp-server-server/
+reinfolib-mcp-server/
 ├── src/
 │   ├── server.ts          # メインサーバー実装
 │   ├── types.ts           # TypeScript型定義
@@ -148,7 +199,10 @@ reinfolib-mcp-server-server/
 │   ├── api/
 │   │   └── reinfolib.ts   # Reinfolib API ラッパー
 │   └── utils/
-│       └── validation.ts  # ユーティリティ関数
+│       └── station.ts     # 駅情報関連ユーティリティ
+├── gis/
+│   ├── N02-22_Station.shp # 駅情報Shapefileデータ
+│   └── N02-22_Station.dbf # 駅情報データベース
 ├── dist/                  # ビルド出力ディレクトリ
 ├── package.json
 ├── tsconfig.json
@@ -158,9 +212,46 @@ reinfolib-mcp-server-server/
 └── README.md
 ```
 
+## 🗾 GISデータについて
+
+駅情報検索機能では、国土交通省の国土数値情報（鉄道データ）を使用しています：
+
+- **データソース**: 国土交通省 国土数値情報（鉄道）N02-22
+- **データ形式**: ESRI Shapefile
+- **収録駅数**: 10,220駅
+- **文字エンコーディング**: Shift-JIS
+
+### 駅コードの形式
+
+駅コードは6桁の数字で構成されます（例：新宿駅=003700、東京駅=003766）。
+
 ## 🔑 APIキーの取得方法
 
 1. [国土交通省 不動産情報ライブラリ](https://www.reinfolib.mlit.go.jp/)にアクセス
 2. アカウントを作成
 3. APIキーを申請・取得
 4. 取得したAPIキーを `.env` ファイルに設定
+
+## 🎯 使用例
+
+### 駅名から不動産取引を検索
+
+```javascript
+// 1. 駅名から駅コードを取得
+const stationCode = await getStationCode("新宿");
+// 結果: "003700"
+
+// 2. 駅コードを使って不動産取引を検索
+const transactions = await searchTransactions({
+  year: "2023",
+  quarter: "1",
+  area: "13",
+  station: stationCode
+});
+```
+
+## 🤝 コントリビューション
+
+バグ報告、機能提案、Pull Requestなど、コントリビューションを歓迎します！
+
+Issue や Pull Request をお気軽に作成してください。
